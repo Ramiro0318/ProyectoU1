@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        tr.seleccionada {
+        background-color: #147ed0;
+        }
+
+
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <table border="1">
+        <thead>
+            <th>No.</th>
+            <th>Numero de control</th>
+            <th>Nombre completo</th>
+            <th>Calificacion</th>   
+            <th>Aprobación</th>                         
+        </thead>
+        <tbody id="tablaAlumnos"></tbody>
+        <!-- <tr>
+            <form>
+                <td><label>1.-</label></td>
+                <td><input type="text" required/></td>
+                <td><input type="text" required/></td>
+                <td><input type="number" required/></td>
+                <td><input type="submit"></td>
+                <tr><input type="number" /></tr>
+            </form>
+        </tr> -->
+    </table>  
+   <div id="accionesGlobales" class="acciones">
+        <button id="btnEditar">Editar</button>
+        <button id="btnEliminar">Eliminar</button>
+    </div>
+
+
+    <form>
+        <table border="1">
+            <tbody id ="tablaAgregar">
+                
+            </tbody>
+        </table>
+    </form>
+
+    <br/>    
+    <label>promedio:</label>
+    <label id = promedio></label>
+  
+    
+    <script>
+        const tableAlumnos = document.getElementById("tablaAlumnos");
+        const tableAgregar = document.getElementById("tablaAgregar");
+        const form = document.querySelector("form");
+        const btnEditar = document.getElementById("btnEditar");
+        const btnEliminar = document.getElementById("btnEliminar");
+        //let row = document.createElement("tr");
+        let promedio = document.getElementById("promedio");
+        let cell = document.createElement("td");
+        let filaSeleccionada = null;
+        let datosSeleccionados = null;
+        let datosAEditar = null;
+        
+
+        const datos = [
+        ["221G0278","ALVAREZ FARÍAS ADRIÁN","71"],
+        ["221G0280","ALVAREZ MONTALVO CARLOS ANTONIO","69"],
+        ["171G0463","DE LEON JUÁREZ CRISTIAN DANIEL","69"],
+        ["221G0290","ESCAREÑO CALZONCIT DAVID","68"],
+        ["221G0296","GARCÍA LEAL CARLOS EMILIANO","84"],
+        ["221G0299","GOMEZ SANCHEZ NOE MISSAEL","90"],
+        ["221G0300","GONZALEZ ARANDA ERICK","50"],
+        ["221G0298","GÓMEZ BACA CRISTIAN ALEJANDRO","16"],
+        ["221G0304","LUGO SALAZAR BRANDON OZIEL","32"],
+        ["221G0158","MATA VILLA ALFREDO HARAN","78"],
+        ["211G0366","MEJÍA CHAVANA JESÚS FEDERICO","46"],
+        ["221G0308","NAJERA PEREZ DAGOBERTO","55"],
+        ["221G0310","PADILLA RAMOS EVELYN NOEMI","70"],
+        ["221G0314","PUENTE ENRIQUEZ JOSE HUMBERTO","63"],
+        ["201G0279","REYES MENDOZA JULIO CESAR","75"],
+        ["221G0316","REYES MENDOZA KEVIN GAEL","40"],
+        ["221G0321","RODRÍGUEZ VALVERDE RAMIRO RONALDO","83"],
+        ["221G0326","SAUCEDO DE LA CRUZ DANIEL ALEJANDRO","81"],
+        ["211G0392","TORRES RIOS CECILIA ESMERALDA","42"],
+        ["221G0330","VELAZQUEZ ESPINOZA TAMARA AZCENETH","60"],
+        ["221G0333","ZAPATA VARGAS DANIEL","15"]
+        ];
+
+
+        function CrearFilasConInputs(datos) {
+            let row = document.createElement("tr");
+            
+            let inputNumeroControl = document.createElement('input');
+            inputNumeroControl.id = "inputNumeroControl";
+            inputNumeroControl.type = "text";
+            inputNumeroControl.required = true;
+            
+            let inputNombre = document.createElement("input");
+            inputNombre.id = "inputNombre";
+            inputNombre.required = true;
+            let inputCalificacion = document.createElement('input');
+            inputCalificacion.id = "inputCalificacion";
+            inputCalificacion.type = "number";
+            inputCalificacion.min = 0;
+            inputCalificacion.max = 100;
+            let inputAprobacion = document.createElement('input');
+            inputAprobacion.id = "inputAprobacion";
+            inputAprobacion.type = "submit";
+            
+            
+            
+            let inputCells = [inputNumeroControl, inputNombre, inputCalificacion, inputAprobacion ];
+            
+            
+            
+            if (datos != null) {
+                inputAprobacion.type = "text";
+                inputAprobacion.readOnly = true;
+                tableAlumnos.replaceChild(row,filaSeleccionada);
+                filaSeleccionada = row;
+                filaSeleccionada.classList.add("seleccionada");
+                
+
+                for (let d = 0; d < datos.length; d++) {
+                    inputCells[d].value = datos[d];
+                }
+                
+            }
+            else {
+                
+                tableAgregar.appendChild(row);
+            }
+                
+                for (let index = 0; index < 5; index++) {
+                    let cell = document.createElement("td");
+                    
+                    
+                    if (index == 0) { cell.textContent = `${row.rowIndex} .-`; }
+                    else{
+                        
+                        cell.appendChild(inputCells[index - 1]);
+                    }
+                    row.appendChild(cell);
+                    
+                }
+
+            return filaSeleccionada;
+                
+             
+            
+        }
+        
+        CrearFilasConInputs(); 
+
+        function Validar(alumno){
+            const regNum = /\d{2}1[ADMTGPQV][0CEML]\d{3}/;
+            
+            if (alumno[0] == undefined || alumno[1] == undefined || alumno[2] == undefined ) 
+            {
+                console.log("Datos faltantes");
+                return false
+            }
+            else if(!regNum.test(alumno[0]))
+            {
+                console.log("Numero de control no cumple con las condiciones");
+                return false;
+            }
+            else if (tableAlumnos.rows.length > 0)
+            {
+                for(let i = 0; i < tableAlumnos.rows.length; i++)
+                {
+                    if (alumno[0] == tableAlumnos.rows[i].cells[1].textContent) {
+                        console.log("Numero de control repetido"); 
+                        return false;   
+                    }
+                    else if (alumno[1].trim().toLowerCase() === tableAlumnos.rows[i].cells[2].textContent.trim().toLowerCase()) {
+                        console.log("Nombre repetido"); 
+                        return false;   
+                    }
+                    else if (alumno[2] > 100 || alumno[2] < 0) {
+                        console.log("Calificacion no valida");
+                        return false;
+                    }
+                }
+                return true;
+            }
+            else return true;
+    
+        }
+
+
+        function CrearNuevoAlumno(alumno)
+        {
+            let newRow = document.createElement("tr");
+            tableAlumnos.appendChild(newRow);
+            for (let index = 0; index < 5; index++) { //usar un .length
+                
+                let newtd = document.createElement("td");
+                if (index == 0) { newtd.textContent = `${newRow.rowIndex}.-`; }
+                else 
+                {
+                    newtd.textContent = alumno[index-1];
+                }
+                newRow.appendChild(newtd);
+                
+            }
+            newRow.cells[4].textContent = alumno[2] >= 70 ? "Aprobado" : "Reprobado";
+            CalcularPromedio();
+            // let total = 0;
+            // for (let index = 0; index < tableAlumnos.rows.length; index++) {
+                
+            //     total += parseFloat(tableAlumnos.rows[index].cells[3].textContent);
+            // }
+            // promedio.textContent = Math.round((total / tableAlumnos.rows.length) * 100) / 100;
+        }
+
+        function EditarAlumno(alumno)
+        {
+            if( Validar(alumno))
+            {
+                let row = document.createElement("tr");
+                
+                for (let index = 0; index < 5; index++) {
+                
+                    let newtd = document.createElement("td");
+                    if (index == 0) { newtd.textContent = `${filaSeleccionada.textContent}.-`; }
+                    else if (index < 4 )
+                    {
+                        newtd.textContent = alumno[index-1];
+                    }
+                    else {
+                        newtd.textContent = alumno[2] >= 70 ? "Aprobado" : "Reprobado";
+                    }
+                    row.appendChild(newtd);
+                }
+
+                tableAlumnos.replaceChild(row,filaSeleccionada);
+                CalcularPromedio();
+                btnEditar.textContent = "Editar";
+                btnEliminar.textContent = "Eliminar";
+            }
+        }
+        function CalcularPromedio()
+        {
+            let total = 0;
+            for (let index = 0; index < tableAlumnos.rows.length; index++) {
+                
+                total += parseFloat(tableAlumnos.rows[index].cells[3].textContent);
+            }
+            promedio.textContent = Math.round((total / tableAlumnos.rows.length) * 100) / 100;
+        }
+    
+      
+            datos.forEach(alumno => {
+                if(Validar(alumno)){CrearNuevoAlumno(alumno);}
+            });
+
+
+        form.addEventListener("submit", function(){
+            event.preventDefault();
+            
+           
+            let NumeroControl = document.getElementById("inputNumeroControl").value.trim().toUpperCase();
+            let Nombre = document.getElementById("nombre").value;
+            let Calificacion = document.getElementById("calificacion").value;
+            //let Aprobacion ; 
+
+            let NuevoAlumno = [NumeroControl, Nombre, Calificacion]
+            
+            if (Validar(NuevoAlumno))
+            {
+                CrearNuevoAlumno(NuevoAlumno);
+            }
+        });
+
+        
+        
+        let acciones = document.getElementById("accionesGlobales");
+        
+        tableAlumnos.addEventListener("pointerdown", function(e) {
+            let fila = e.target.closest("tr");
+                                                //optimizar eliminando fila
+            if (!fila || !tableAlumnos.contains(fila)) return;
+            
+            Array.from(tableAlumnos.rows).forEach(r => r.classList.remove("seleccionada"));
+            
+            
+            fila.classList.add("seleccionada");
+            filaSeleccionada = fila; //Cambi[e fila seleccionada por row y row por fila seleccionada
+            fila = null;
+        });
+        
+        document.addEventListener("pointerdown", function(e) {
+            if(!tableAlumnos.contains(e.target) && (!acciones || !acciones.contains(e.target)))
+                                                    //!document.getElementById("accionesGlobales")) 
+            {
+
+                Array.from(tableAlumnos.rows).forEach(r => r.classList.remove("seleccionada"));
+                filaSeleccionada = null;
+            }
+
+        });
+
+        let clonFila = null; 
+        // Botones
+        btnEditar.onclick = function() {
+            if(this.textContent == "Aceptar") {
+                
+                datosAEditar = Array.from(filaSeleccionada.cells).slice(1, -1)
+                .map(function(td) {return td.firstElementChild.value.trim();})
+                
+                EditarAlumno(datosAEditar);
+            
+            }
+            else{
+
+                if (filaSeleccionada) {
+                    
+                    clonFila = filaSeleccionada.cloneNode(true);
+                    datosSeleccionados = Array.from(filaSeleccionada.cells).map(function(td)
+                    {return td.textContent.trim();}).slice(1);
+                    filaSeleccionada = CrearFilasConInputs(datosSeleccionados);
+
+                    btnEditar.textContent = "Aceptar";
+                    btnEliminar.textContent = "Cancelar";
+                    
+                } else {
+                    filaSeleccionada = null;
+                    return;
+                }
+            }
+        };
+
+        btnEliminar.onclick = function() {
+            if(this.textContent == "Cancelar")
+            {
+
+                tableAlumnos.replaceChild(clonFila,filaSeleccionada);
+                filaSeleccionada = null;
+                clonFila = null;
+                btnEditar.textContent = "Editar";
+                btnEliminar.textContent = "Eliminar";
+                    
+            }
+            else {
+
+                if (filaSeleccionada) {
+                    tableAlumnos.removeChild(filaSeleccionada);
+                    CalcularPromedio();
+                    filaSeleccionada = null;
+                } else {
+                    alert("Primero selecciona una fila");
+                }
+            }
+        };
+
+
+
+
+    </script>
+</body>
+</html>
