@@ -57,7 +57,7 @@ table {
     background-color: var(--ColorClaro);
     max-width: 95%;
     width: 95%;
-    margin: 15px;
+    margin: 15px 15px 150px 15px;
     border-radius: 10px;
     box-shadow: 3px 5px lightgray;
     border-spacing: 0 10px;
@@ -132,9 +132,12 @@ table tr td input {
     width: 90%;
 }
 
-
 .invisivle {
-    color: transparent;
+    opacity: 0;
+}
+.error {
+    color: red;
+    margin: 0 0 0 20px;
 }
 div.visible {
     display:flex;
@@ -151,6 +154,7 @@ table tr.seleccionada {
 }
 .tablaInput {
     table-layout: fixed;
+    margin: 15px;
 }
 tr td.aprobado {
     background-color: var(--ColorAprobado);

@@ -34,6 +34,7 @@
                 <tbody id ="tablaAgregar">
                 </tbody>
             </table>
+            <label id = error class="error">soy invisible</label>
         </form>
     </span>
     <div id="accionesGlobales" class="acciones">
@@ -49,16 +50,6 @@
             <th>Aprobación</th>                         
         </thead>
         <tbody id="tablaAlumnos"></tbody>
-        <!-- <tr>
-            <form>
-                <td><label>1.-</label></td>
-                <td><input type="text" required/></td>
-                <td><input type="text" required/></td>
-                <td><input type="number" required/></td>
-                <td><input type="submit"></td>
-                <tr><input type="number" /></tr>
-            </form>
-        </tr> -->
     </table>  
    
 
@@ -70,7 +61,7 @@
         const btnEditar = document.getElementById("btnEditar");
         const btnEliminar = document.getElementById("btnEliminar");
         const acciones = document.getElementById("accionesGlobales");
-        //let row = document.createElement("tr");
+        const lblError = document.getElementById("error");
         let promedio = document.getElementById("promedio");
         let cell = document.createElement("td");
         let filaSeleccionada = null;
@@ -171,16 +162,19 @@
         CrearFilasConInputs(); 
 
         function Validar(alumno){
-            const regNum = /\d{2}1[ADMTGPQV][0CEML]\d{3}/;
+            const regNum = /\d{2}1[ADMTGPQVI][0CEML]\d{3}/;
+            lblError.classList.remove("invisivle");
             
             if (alumno[0] == undefined || alumno[1] == undefined || alumno[2] == undefined ) 
             {
                 console.log("Datos faltantes");
+                
                 return false
             }
             else if(!regNum.test(alumno[0]))
             {
                 console.log("Numero de control no cumple con las condiciones");
+                lblError.textContent = "Numero de control no cumple con las condiciones";
                 return false;
             }
             else if (tableAlumnos.rows.length > 0)
@@ -189,14 +183,17 @@
                 {
                     if (alumno[0] == tableAlumnos.rows[i].cells[1].textContent) {
                         console.log("Numero de control repetido"); 
+                        lblError.textContent = "Numero de control repetido";
                         return false;   
                     }
                     else if (alumno[1].trim().toLowerCase() === tableAlumnos.rows[i].cells[2].textContent.trim().toLowerCase()) {
-                        console.log("Nombre repetido"); 
+                        console.log("Nombre repetido");
+                        lblError.textContent = "Nombre repetido";
                         return false;   
                     }
-                    else if (alumno[2] > 100 || alumno[2] < 0) {
+                    else if (alumno[2] > 100 || alumno[2] < 0) { 
                         console.log("Calificacion no valida");
+                        lblError.textContent = "Calificacion no valida"; //Nunca se va a mostrar
                         return false;
                     }
                 }
@@ -230,6 +227,7 @@
             else if (newRow.cells[4].textContent === "Reprobado") { newRow.cells[4].classList.add("reprobado"); }
             
             CalcularPromedio();
+            lblError.classList.add("invisivle");
             // let total = 0;
             // for (let index = 0; index < tableAlumnos.rows.length; index++) {
                 
@@ -264,15 +262,13 @@
                     }
                     else if (newtd.textContent === "Reprobado") { newtd.classList.add("reprobado"); }
 
-                    
-
-
                 }
 
                 tableAlumnos.replaceChild(row,filaSeleccionada);
                 CalcularPromedio();
                 btnEditar.textContent = "Editar";
                 btnEliminar.textContent = "Eliminar";
+                lblError.classList.add("invisivle");
             }
         }
         function CalcularPromedio()
@@ -291,7 +287,7 @@
             });
 
             form.addEventListener("submit", function(){
-                if (!enTransaccion){return}
+                if (enTransaccion){return}
                 event.preventDefault();
             
            
@@ -309,7 +305,27 @@
         });
 
         
-        
+        tableAlumnos.addEventListener("dblclick", function(e) {
+            if (enTransaccion){return}
+            if(filaSeleccionada){
+                                                      
+                clonFila = filaSeleccionada.cloneNode(true);
+                datosSeleccionados = Array.from(filaSeleccionada.cells).map(function(td)
+                {return td.textContent.trim();}).slice(1);
+                filaSeleccionada = CrearFilasConInputs(datosSeleccionados);
+
+                btnEditar.textContent = "Aceptar";
+                btnEliminar.textContent = "Cancelar";
+                
+            } else {
+
+                filaSeleccionada = null;
+                return;
+            }
+            enTransaccion = true;
+  
+        });
+
         tableAlumnos.addEventListener("pointerdown", function(e) {
             if (enTransaccion){return}
             let fila = e.target.closest("tr");
@@ -331,7 +347,15 @@
             {
                 acciones.classList.remove("visible");
                 Array.from(tableAlumnos.rows).forEach(r => r.classList.remove("seleccionada"));
-                filaSeleccionada = null;
+                if (clonFila != null){
+
+                    tableAlumnos.replaceChild(clonFila,filaSeleccionada);
+                    filaSeleccionada = null;
+                    clonFila = null;
+                    enTransaccion = false;
+                    btnEditar.textContent = "Editar";
+                    btnEliminar.textContent = "Eliminar";
+                } 
             }
 
         });
@@ -391,7 +415,8 @@
                     acciones.classList.remove("visible");
                     filaSeleccionada = null;
                 } else {
-                    alert("Primero selecciona una fila");
+                    console.log("Primero selecciona una fila");
+                    lblError.textContent = "Primero selecciona una fila";
                 }
             }
         };
