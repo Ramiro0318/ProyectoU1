@@ -32,7 +32,8 @@ h1 {
 
 span {
     display: flex;
-    justify-self: end;
+    flex-direction: column;
+    justify-self: stretch;
     margin: 10px;
 }
 label {
@@ -41,12 +42,18 @@ label {
     font-weight: bold;
 }
 
-.invisivle {
-    color: transparent;
+form {
+    justify-self: start;
+    display:grid;
+    width: 100%;
+    margin: 0 auto;
 }
 
 table {
+    
+    z-index: 2;
     align-self: center;
+    justify-self: center;
     background-color: var(--ColorClaro);
     max-width: 95%;
     width: 95%;
@@ -59,8 +66,6 @@ table {
     border-collapse: separate;
     overflow: hidden;
 }
-
-
 
 table thead {
     background-color: var(--ColorPrimario);
@@ -77,22 +82,26 @@ table tr:nth-of-type(2n) {
     background-color: var(--ColorClaroAlternativo);
 }
 
-
 div{
+    display: none;
     position:fixed;
     z-index: 2;
-    display: none;
     justify-content: center;
     width: 100%;
     background-color: var(--ColorAcento);
     bottom: 0;
-    height: 12%;
+    height: 10%;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    border: 3px solid var(--ColorSeleccionado); 
+    
 }
 
 div button {
     width: 100%;
     background-color: transparent;
     border: 0;
+    font-size: 2em;
     
 }
 
@@ -100,6 +109,7 @@ table tr td {
     height: 100%;
     padding: 4px 3px 4px 3px;
     align-items: center;
+    table-layout: fixed;
 }
 
 table tr td:first-child {
@@ -116,21 +126,110 @@ table tr td input {
     margin: 0px;
     vertical-align: middle;
     border: 0;
+    font-size: 1.08em;
+    min-width: 0;
+    max-width: 90%;
+    width: 90%;
 }
 
+
+.invisivle {
+    color: transparent;
+}
 div.visible {
     display:flex;
     box-shadow: 1.5px .15px 4px  lightblue;
+    animation: mostrar 0.6s;
 }
+span.promedio {
 
+    flex-direction: row;
+    align-self: flex-end;
+}
 table tr.seleccionada {
     background-color: var(--ColorSeleccionado);
 }
-
+.tablaInput {
+    table-layout: fixed;
+}
 tr td.aprobado {
     background-color: var(--ColorAprobado);
 }
 tr td.reprobado {
     background-color: var(--ColorReprobado);
+}
+@keyframes mostrar {
+    from {
+        transform: translateY(100vh);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+
+@media(min-width: 740px) {
+
+   div{
+        display: flex;
+        position: initial;
+        opacity: 0;
+        flex-direction: row;
+        width: 190px;
+        border-radius: 5px;
+        height: 10%;
+        padding: 3px;
+        border: 0 solid;
+    }
+    
+    div button {
+        background-color: var(--ColorPrimario);
+        font-size: 1.5em;
+        border: none; 
+        border-width: 0;
+    }
+    div.visible {
+        display:flex;
+        opacity: 100%;
+        animation: mostrar 0.6s;
+    }
+
+    @keyframes mostrar {
+        from {
+            transform: translateY(5vh);
+            opacity: 20%;
+        }
+        to {
+            transform: translateY(0vh);
+            opacity: 100%;
+        }
+    }
+
+}
+
+
+
+
+@media(min-width: 950px) {
+    
+    span{
+        max-width: 1400px;
+        display: flex;
+        flex-direction: row-reverse;
+        
+    }
+
+    span.promedio {
+        align-self: center;
+        align-self: center;
+        align-content: center;
+        justify-items: center;
+        justify-content: center;
+        justify-self: center;
+    }
+    .tablaInput {
+        max-width: 1200px;
+        justify-self: flex-start;
+    }
 }
 

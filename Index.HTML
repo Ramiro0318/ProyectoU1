@@ -14,25 +14,32 @@
 
     <h1>Registro de calificaciones</h1>
     
-    <span class="promedio">
-        <label>Promedio:</label>
-        <label class="invisivle">_</label>
-        <label id = promedio></label>
-    </span>
-  
-    <form>
-        <table class="tablaInput">
-            <thead>
-                <th>No.</th>
-                <th>Numero de control</th>
-                <th>Nombre completo</th>
-                <th>Calificacion</th>   
-                <th>Aprobación</th>                         
-            </thead>
+    <span>
+
+        <span class="promedio">
+            <label>Promedio:</label>
+            <label class="invisivle">_</label>
+            <label id = promedio></label>
+        </span>
+        
+        <form>
+            <table class="tablaInput">
+                <thead>
+                    <th>No.</th>
+                    <th>Numero de control</th>
+                    <th>Nombre completo</th>
+                    <th>Calificacion</th>   
+                    <th>Aprobación</th>                         
+                </thead>
                 <tbody id ="tablaAgregar">
                 </tbody>
-        </table>
-    </form>
+            </table>
+        </form>
+    </span>
+    <div id="accionesGlobales" class="acciones">
+        <button id="btnEditar">Editar</button>
+        <button id="btnEliminar">Eliminar</button>
+    </div>
     <table>
         <thead>
             <th>No.</th>
@@ -53,10 +60,7 @@
             </form>
         </tr> -->
     </table>  
-   <div id="accionesGlobales" class="acciones">
-        <button id="btnEditar">Editar</button>
-        <button id="btnEliminar">Eliminar</button>
-    </div>
+   
 
     
     <script>
@@ -119,6 +123,7 @@
             let inputAprobacion = document.createElement('input');
             inputAprobacion.id = "inputAprobacion";
             inputAprobacion.type = "submit";
+            inputAprobacion.value = "Agregar"
             
             
             
