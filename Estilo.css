@@ -134,6 +134,7 @@ table tr td input {
 
 .invisivle {
     opacity: 0;
+    height: 0;
 }
 .error {
     color: red;
