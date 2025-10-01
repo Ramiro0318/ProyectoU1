@@ -2,18 +2,38 @@
 <html lang="en">
 <head>
     <style>
-        tr.seleccionada {
-        background-color: #147ed0;
-        }
 
 
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link href="Estilo.css" rel="stylesheet">
+    <title>Lista de alumnos</title>
 </head>
 <body>
-    <table border="1">
+
+    <h1>Registro de calificaciones</h1>
+    
+    <span class="promedio">
+        <label>Promedio:</label>
+        <label class="invisivle">_</label>
+        <label id = promedio></label>
+    </span>
+  
+    <form>
+        <table class="tablaInput">
+            <thead>
+                <th>No.</th>
+                <th>Numero de control</th>
+                <th>Nombre completo</th>
+                <th>Calificacion</th>   
+                <th>Aprobación</th>                         
+            </thead>
+                <tbody id ="tablaAgregar">
+                </tbody>
+        </table>
+    </form>
+    <table>
         <thead>
             <th>No.</th>
             <th>Numero de control</th>
@@ -38,19 +58,6 @@
         <button id="btnEliminar">Eliminar</button>
     </div>
 
-
-    <form>
-        <table border="1">
-            <tbody id ="tablaAgregar">
-                
-            </tbody>
-        </table>
-    </form>
-
-    <br/>    
-    <label>promedio:</label>
-    <label id = promedio></label>
-  
     
     <script>
         const tableAlumnos = document.getElementById("tablaAlumnos");
@@ -58,12 +65,14 @@
         const form = document.querySelector("form");
         const btnEditar = document.getElementById("btnEditar");
         const btnEliminar = document.getElementById("btnEliminar");
+        const acciones = document.getElementById("accionesGlobales");
         //let row = document.createElement("tr");
         let promedio = document.getElementById("promedio");
         let cell = document.createElement("td");
         let filaSeleccionada = null;
         let datosSeleccionados = null;
         let datosAEditar = null;
+        let enTransaccion = false;
         
 
         const datos = [
@@ -76,7 +85,7 @@
         ["221G0300","GONZALEZ ARANDA ERICK","50"],
         ["221G0298","GÓMEZ BACA CRISTIAN ALEJANDRO","16"],
         ["221G0304","LUGO SALAZAR BRANDON OZIEL","32"],
-        ["221G0158","MATA VILLA ALFREDO HARAN","78"],
+        ["221G0158","MATA VILLA ALFREDO HARAN","100"],
         ["211G0366","MEJÍA CHAVANA JESÚS FEDERICO","46"],
         ["221G0308","NAJERA PEREZ DAGOBERTO","55"],
         ["221G0310","PADILLA RAMOS EVELYN NOEMI","70"],
@@ -87,7 +96,7 @@
         ["221G0326","SAUCEDO DE LA CRUZ DANIEL ALEJANDRO","81"],
         ["211G0392","TORRES RIOS CECILIA ESMERALDA","42"],
         ["221G0330","VELAZQUEZ ESPINOZA TAMARA AZCENETH","60"],
-        ["221G0333","ZAPATA VARGAS DANIEL","15"]
+        ["221G0333","ZAPATA VARGAS DANIEL","0"]
         ];
 
 
@@ -209,6 +218,12 @@
                 
             }
             newRow.cells[4].textContent = alumno[2] >= 70 ? "Aprobado" : "Reprobado";
+            if (newRow.cells[4].textContent === "Aprobado" )
+            {
+                newRow.cells[4].classList.add("aprobado");
+            }
+            else if (newRow.cells[4].textContent === "Reprobado") { newRow.cells[4].classList.add("reprobado"); }
+            
             CalcularPromedio();
             // let total = 0;
             // for (let index = 0; index < tableAlumnos.rows.length; index++) {
@@ -227,15 +242,26 @@
                 for (let index = 0; index < 5; index++) {
                 
                     let newtd = document.createElement("td");
-                    if (index == 0) { newtd.textContent = `${filaSeleccionada.textContent}.-`; }
+                    if (index == 0) { newtd.textContent = `${filaSeleccionada.textContent}`; }
                     else if (index < 4 )
                     {
                         newtd.textContent = alumno[index-1];
                     }
                     else {
                         newtd.textContent = alumno[2] >= 70 ? "Aprobado" : "Reprobado";
+                        
+                        
                     }
                     row.appendChild(newtd);
+                    if (newtd.textContent === "Aprobado" )
+                    {
+                        newtd.classList.add("aprobado");
+                    }
+                    else if (newtd.textContent === "Reprobado") { newtd.classList.add("reprobado"); }
+
+                    
+
+
                 }
 
                 tableAlumnos.replaceChild(row,filaSeleccionada);
@@ -259,29 +285,28 @@
                 if(Validar(alumno)){CrearNuevoAlumno(alumno);}
             });
 
-
-        form.addEventListener("submit", function(){
-            event.preventDefault();
+            form.addEventListener("submit", function(){
+                if (!enTransaccion){return}
+                event.preventDefault();
             
            
-            let NumeroControl = document.getElementById("inputNumeroControl").value.trim().toUpperCase();
-            let Nombre = document.getElementById("nombre").value;
-            let Calificacion = document.getElementById("calificacion").value;
-            //let Aprobacion ; 
+                let NumeroControl = document.getElementById("inputNumeroControl").value.trim().toUpperCase();
+                let Nombre = document.getElementById("inputNombre").value;
+                let Calificacion = document.getElementById("inputCalificacion").value;
+                //let Aprobacion ; 
 
-            let NuevoAlumno = [NumeroControl, Nombre, Calificacion]
-            
-            if (Validar(NuevoAlumno))
-            {
-                CrearNuevoAlumno(NuevoAlumno);
-            }
+                let NuevoAlumno = [NumeroControl, Nombre, Calificacion]
+                
+                if (Validar(NuevoAlumno))
+                {
+                    CrearNuevoAlumno(NuevoAlumno);
+                }
         });
 
         
         
-        let acciones = document.getElementById("accionesGlobales");
-        
         tableAlumnos.addEventListener("pointerdown", function(e) {
+            if (enTransaccion){return}
             let fila = e.target.closest("tr");
                                                 //optimizar eliminando fila
             if (!fila || !tableAlumnos.contains(fila)) return;
@@ -290,6 +315,7 @@
             
             
             fila.classList.add("seleccionada");
+            acciones.classList.add("visible");
             filaSeleccionada = fila; //Cambi[e fila seleccionada por row y row por fila seleccionada
             fila = null;
         });
@@ -298,7 +324,7 @@
             if(!tableAlumnos.contains(e.target) && (!acciones || !acciones.contains(e.target)))
                                                     //!document.getElementById("accionesGlobales")) 
             {
-
+                acciones.classList.remove("visible");
                 Array.from(tableAlumnos.rows).forEach(r => r.classList.remove("seleccionada"));
                 filaSeleccionada = null;
             }
@@ -314,6 +340,8 @@
                 .map(function(td) {return td.firstElementChild.value.trim();})
                 
                 EditarAlumno(datosAEditar);
+                acciones.classList.remove("visible");
+                enTransaccion = false;
             
             }
             else{
@@ -329,9 +357,11 @@
                     btnEliminar.textContent = "Cancelar";
                     
                 } else {
+
                     filaSeleccionada = null;
                     return;
                 }
+                enTransaccion = true;
             }
         };
 
@@ -342,15 +372,18 @@
                 tableAlumnos.replaceChild(clonFila,filaSeleccionada);
                 filaSeleccionada = null;
                 clonFila = null;
+                acciones.classList.remove("visible");
+                Array.from(tableAlumnos.rows).forEach(r => r.classList.remove("seleccionada"));
                 btnEditar.textContent = "Editar";
                 btnEliminar.textContent = "Eliminar";
-                    
+                enTransaccion = false;
             }
             else {
 
                 if (filaSeleccionada) {
                     tableAlumnos.removeChild(filaSeleccionada);
                     CalcularPromedio();
+                    acciones.classList.remove("visible");
                     filaSeleccionada = null;
                 } else {
                     alert("Primero selecciona una fila");
